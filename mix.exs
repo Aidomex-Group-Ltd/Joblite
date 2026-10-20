@@ -31,7 +31,9 @@ defmodule Joblite.Web.MixProject do
       {:bandit, "~> 1.0"},
       {:jason, "~> 1.4"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
-      {:lazy_html, ">= 0.1.0", only: :test}
+      {:lazy_html, ">= 0.1.0", only: :test},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:sobelow, "~> 0.14", only: [:dev, :test], runtime: false}
     ]
   end
 
@@ -40,7 +42,7 @@ defmodule Joblite.Web.MixProject do
       "assets.setup": ["esbuild.install --if-missing"],
       "assets.build": ["esbuild default"],
       "assets.deploy": ["esbuild default --minify", "phx.digest"],
-      check: ["format --check-formatted", "compile --warnings-as-errors", "test"]
+      check: ["format --check-formatted", "compile --warnings-as-errors", "credo", "test"]
     ]
   end
 end
