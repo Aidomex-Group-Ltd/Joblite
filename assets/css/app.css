@@ -1,0 +1,15 @@
+:root { font-family: system-ui, sans-serif; color: #15304a; background: #f4f7fa; }
+body { margin: 0; line-height: 1.6; }
+a { color: #086c73; }
+.site-header { padding: 1.1rem 5vw; border-bottom: 1px solid #d4e0e9; background: white; }
+.site-header a { font-weight: 750; text-decoration: none; }
+.container { max-width: 850px; padding: 4rem 1.5rem; margin: auto; }
+h1 { font-size: clamp(2rem, 5vw, 3.6rem); line-height: 1.15; max-width: 18ch; }
+.eyebrow { color: #086c73; font-weight: 700; }
+.architecture { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; }
+.architecture div { padding: 1rem; background: white; border: 1px solid #d4e0e9; border-radius: .7rem; }
+dt { font-weight: 700; } dd { margin: .4rem 0 0; }
+button { padding: .7rem 1rem; border: 0; border-radius: .4rem; color: white; background: #086c73; cursor: pointer; }
+button:focus-visible, a:focus-visible { outline: 3px solid #bf4d15; outline-offset: 3px; }
+.skip-link { position: absolute; top: -5rem; left: 1rem; background: white; padding: .5rem; }
+.skip-link:focus { top: .5rem; }
