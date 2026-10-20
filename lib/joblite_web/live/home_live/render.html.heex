@@ -1,15 +1,29 @@
 <p class="eyebrow">Foundation starter</p>
 <h1>Hiring intelligence, built to be understood.</h1>
-<p>This starter establishes the monolith boundary. Hiring and AI features are not implemented yet.</p>
+<p>
+  This starter establishes the monolith boundary. Hiring and AI features are not implemented yet.
+</p>
 <dl class="architecture">
-  <div><dt>Interface</dt><dd>{@architecture.ui}</dd></div>
-  <div><dt>Data store</dt><dd>{@architecture.database}</dd></div>
-  <div><dt>Deployment</dt><dd>{@architecture.runtime}</dd></div>
+  <div>
+    <dt>Interface</dt><dd>{@architecture.ui}</dd>
+  </div>
+  <div>
+    <dt>Data store</dt><dd>{@architecture.database}</dd>
+  </div>
+  <div>
+    <dt>Deployment</dt><dd>{@architecture.runtime}</dd>
+  </div>
 </dl>
-<button id="architecture-details" phx-click="toggle-details" aria-expanded={to_string(@show_details)}>
+<button
+  id="architecture-details"
+  phx-click="toggle-details"
+  aria-expanded={to_string(@show_details)}
+>
   Explain the repository boundary
 </button>
 <section :if={@show_details} id="boundary-explanation" aria-label="Repository boundary">
   <h2>Two repositories, one application</h2>
-  <p>LiveView calls public backend functions in the same BEAM. Only backend contexts access PostgreSQL.</p>
+  <p>
+    LiveView calls public backend functions in the same BEAM. Only backend contexts access PostgreSQL.
+  </p>
 </section>

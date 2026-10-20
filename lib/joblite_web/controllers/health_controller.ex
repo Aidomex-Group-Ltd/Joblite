@@ -5,7 +5,9 @@ defmodule JobliteWeb.HealthController do
 
   def ready(conn, _params) do
     case Joblite.Health.readiness() do
-      :ok -> json(conn, %{status: "ready"})
+      :ok ->
+        json(conn, %{status: "ready"})
+
       {:error, :database_unavailable} ->
         conn |> put_status(:service_unavailable) |> json(%{status: "not_ready"})
     end

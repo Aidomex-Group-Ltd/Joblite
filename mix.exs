@@ -18,6 +18,10 @@ defmodule Joblite.Web.MixProject do
     [extra_applications: [:logger, :runtime_tools], mod: {JobliteWeb.Application, []}]
   end
 
+  def cli do
+    [preferred_envs: [check: :test]]
+  end
+
   defp deps do
     [
       {:joblite_core, path: "../backend", env: Mix.env()},

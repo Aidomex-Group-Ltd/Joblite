@@ -5,7 +5,9 @@ defmodule JobliteWeb.Application do
   @impl true
   def start(_type, _args) do
     Supervisor.start_link([JobliteWeb.Endpoint],
-      strategy: :one_for_one, name: JobliteWeb.Supervisor)
+      strategy: :one_for_one,
+      name: JobliteWeb.Supervisor
+    )
   end
 
   @impl true
