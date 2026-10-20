@@ -16,7 +16,7 @@ const { chromium } = require("playwright");
   page.on("console", (m) => { if (m.type() === "error") consoleErrors.push(m.text()); });
 
   const base = process.env.JOBLITE_BASE_URL || "http://localhost:4000";
-  const resp = await page.goto(base + "/", { waitUntil: "networkidle" });
+  const resp = await page.goto(base + "/", { waitUntil: "domcontentloaded", timeout: 20000 });
   if (resp.status() !== 200) throw new Error("expected 200, got " + resp.status());
 
   await page.waitForSelector("[data-phx-main].phx-connected", { timeout: 15000 });
