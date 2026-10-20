@@ -17,3 +17,12 @@ That composition-root role does not permit UI modules to access persistence.
 The initial HomeLive uses core metadata and handles a connected event. It is not
 an ATS, an authentication implementation or evidence that PostgreSQL was tested.
 The local runtime prevented compilation in the authoring session. P01 remains open.
+
+## Verified in the Linux implementation session (P01.04)
+
+`scripts/browser_smoke.js` drives a headless Chromium against `mix phx.server` on
+`http://localhost:4000` and asserts asset delivery, a joined LiveView WebSocket,
+a working `phx-click` event and liveness. ExUnit LiveView tests do not execute
+browser JavaScript, so this smoke check complements them. Readiness legitimately
+returns 503 until the P02 database exists. The dev `check_origin: true` setting
+allows the configured `url` host `localhost` only.
