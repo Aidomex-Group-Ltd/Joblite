@@ -1,3 +1,18 @@
 <a class="skip-link" href="#main">Skip to content</a>
-<header class="site-header"><a href="/">Joblite AHIS</a></header>
+<header class="site-header">
+  <a href="/">Joblite AHIS</a>
+  <nav aria-label="Account">
+    <%= if @current_user do %>
+      <a href="/account">Account</a>
+    <% else %>
+      <a href="/users/log-in">Log in</a>
+    <% end %>
+  </nav>
+</header>
+<%= if info = @flash[:info] do %>
+  <p class="flash-info" role="status">{info}</p>
+<% end %>
+<%= if error = @flash[:error] do %>
+  <p class="flash-error" role="alert">{error}</p>
+<% end %>
 <main id="main" class="container">{@inner_content}</main>
