@@ -10,3 +10,5 @@
 /priv/static/cache_manifest.json
 /.joblite-backups/
 /erl_crash.dump
+/secrets/*
+!/secrets/*.example

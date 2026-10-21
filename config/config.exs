@@ -1,4 +1,7 @@
 import Config
+# secrets.exs loads the gitignored development secrets and exports them as
+# environment variables; shared.exs reads DATABASE_URL from the environment.
+import_config "../../backend/config/secrets.exs"
 import_config "../../backend/config/shared.exs"
 
 config :phoenix, :json_library, Jason
@@ -9,7 +12,7 @@ config :joblite_web, JobliteWeb.Endpoint,
   adapter: Bandit.PhoenixAdapter,
   pubsub_server: Joblite.PubSub,
   render_errors: [formats: [html: JobliteWeb.ErrorHTML], layout: false],
-  live_view: [signing_salt: "joblite-live-v1"]
+  live_view: [signing_salt: System.get_env("LIVE_SIGNING_SALT") || "joblite-live-v1"]
 
 config :esbuild,
   version: "0.25.5",
