@@ -19,7 +19,9 @@ defmodule JobliteWeb.HomeLive.Components.Icons do
     "left" => "M14 6l-6 6 6 6",
     "right" => "M10 6l6 6-6 6",
     "expand" => "M8 3H3v5 M16 3h5v5 M21 16v5h-5 M8 21H3v-5",
-    "briefcase" => "M3 7h18v14H3z M8 7V3h8v4 M3 12h18 M10 12v3h4v-3"
+    "briefcase" => "M3 7h18v14H3z M8 7V3h8v4 M3 12h18 M10 12v3h4v-3",
+    "compass" => "M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20 M15.5 8.5l-2.2 5.3-5.3 2.2 2.2-5.3z",
+    "external" => "M14 4h6v6 M20 4l-9 9 M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"
   }
   attr(:name, :string, required: true)
 

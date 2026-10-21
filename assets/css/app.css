@@ -1,4 +1,5 @@
 @import "./home_feed/index.css";
+@import "./explore/boards.css";
 
 /* Shared chrome for the pages that surround the feed. Feed rules live in home_feed/. */
 .site-header {

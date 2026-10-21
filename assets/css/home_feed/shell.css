@@ -13,10 +13,12 @@
 .jf-quick-compose { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--jf-line); }
 .jf-quick-compose > button:not(.jf-icon-button) { flex: 1; min-width: 0; text-align: left; font-size: 14px; min-height: 44px; color: var(--jf-muted); }
 .jf-quick-compose > .jf-icon-button { color: var(--jf-accent); }
-.jf-bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%,620px); display: grid; grid-template-columns: repeat(4,1fr); align-items: center; min-height: 65px; padding: 4px 4px calc(4px + env(safe-area-inset-bottom)); background: var(--jf-surface); border: 1px solid var(--jf-line); border-bottom: 0; z-index: 3; }
+.jf-bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%,620px); display: grid; grid-template-columns: repeat(5,1fr); align-items: center; min-height: 65px; padding: 4px 4px calc(4px + env(safe-area-inset-bottom)); background: var(--jf-surface); border: 1px solid var(--jf-line); border-bottom: 0; z-index: 3; }
 .jf-bottom-nav button { display: grid; justify-items: center; align-content: center; gap: 4px; height: 52px; color: var(--jf-muted); font-size: 11px; }
 .jf-bottom-nav button[aria-current="page"] { color: var(--jf-text); font-weight: 650; }
 .jf-bottom-nav button:last-child { color: var(--jf-accent); }
+.jf-bottom-nav .jf-nav-link { display: grid; justify-items: center; align-content: center; gap: 4px; height: 52px; color: var(--jf-muted); font-size: 11px; text-decoration: none; }
+.jf-bottom-nav .jf-nav-link svg { width: 21px; height: 21px; }
 .jf-empty { text-align: center; padding: 50px 25px; }
 .jf-empty h2 { font-size: 24px; margin-bottom: 13px; }
 .jf-empty p { color: var(--jf-muted); font-size: 14px; line-height: 1.7; }

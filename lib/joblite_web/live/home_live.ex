@@ -1,18 +1,35 @@
 defmodule JobliteWeb.HomeLive do
-  @moduledoc "A modular candidate feed with explicit session-only preview state."
+  @moduledoc """
+  A modular candidate feed with explicit session-only preview state.
+
+  The feed carries one job board discovery card. The card comes from the
+  registry in the core, is placed among the candidate posts and is labelled
+  directory content. Its rotation follows the visits of the browser session,
+  so a session meets another board when it opens the feed again.
+  """
   use Phoenix.LiveView, layout: {JobliteWeb.Layouts, :app}
 
+  alias Joblite.JobBoards
   alias JobliteWeb.HomeLive.{FeedState, PostForm}
+  alias JobliteWeb.SessionIdentity
   import JobliteWeb.HomeLive.Components.FeedShell
-  import JobliteWeb.HomeLive.Components.FeedPost
+  import JobliteWeb.HomeLive.Components.FeedStream
   import JobliteWeb.HomeLive.Components.Composer
   import JobliteWeb.HomeLive.Components.MediaViewer
 
   embed_templates("home_live/render.html")
 
   @impl true
-  def mount(_params, _session, socket) do
-    {:ok, assign(socket, feed: FeedState.new(), architecture: Joblite.Health.architecture())}
+  def mount(_params, session, socket) do
+    socket =
+      socket
+      |> SessionIdentity.attach(session)
+      |> assign(:feed, FeedState.new())
+      |> assign(:architecture, Joblite.Health.architecture())
+      |> assign(:excluded_boards, [])
+      |> assign(:discovery_offset, max((session["job_board_discovery_visit"] || 1) - 1, 0))
+
+    {:ok, load_discovery(socket)}
   end
 
   @impl true
@@ -46,9 +63,83 @@ defmodule JobliteWeb.HomeLive do
     {:noreply, assign(socket, :feed, feed)}
   end
 
+  def handle_event("boards:save", %{"id" => id}, socket) do
+    with {:ok, user} <- signed_in(socket),
+         {:ok, _saved} <- JobBoards.save_board(user, id) do
+      {:noreply, notice(socket, "Board saved. Find it under Saved boards.")}
+    else
+      {:error, :not_signed_in} ->
+        {:noreply, notice(socket, "Log in to save a board.")}
+
+      {:error, :unknown_source} ->
+        {:noreply, notice(socket, "That board is no longer in the directory.")}
+    end
+  end
+
+  def handle_event("boards:dismiss", %{"id" => id}, socket) do
+    case SessionIdentity.current_user(socket) do
+      nil ->
+        {:noreply,
+         socket
+         |> exclude_board(id)
+         |> load_discovery()
+         |> notice("Board hidden for this session.")}
+
+      user ->
+        case JobBoards.dismiss_board(user, id) do
+          {:ok, _dismissal} ->
+            {:noreply,
+             socket
+             |> exclude_board(id)
+             |> load_discovery()
+             |> notice("Board hidden. You can bring it back from Saved boards.")}
+
+          {:error, :unknown_source} ->
+            {:noreply, notice(socket, "That board is no longer in the directory.")}
+        end
+    end
+  end
+
   def handle_event(_event, _params, socket) do
     {:noreply,
      assign(socket, :feed, %{socket.assigns.feed | notice: "That action is unavailable."})}
+  end
+
+  @doc "The discovery card of the feed, or nil while the registry is loading."
+  @spec discovery_card(Phoenix.LiveView.AsyncResult.t()) :: map() | nil
+  def discovery_card(%Phoenix.LiveView.AsyncResult{ok?: true, result: [card | _rest]}), do: card
+  def discovery_card(_result), do: nil
+
+  defp load_discovery(socket) do
+    user = socket.assigns.current_user
+    offset = socket.assigns.discovery_offset
+    excluded = socket.assigns.excluded_boards
+
+    assign_async(socket, :discovery, fn ->
+      cards =
+        JobBoards.discovery_cards(user,
+          limit: 1,
+          exclude_source_ids: excluded,
+          offset: offset
+        )
+
+      {:ok, %{discovery: cards}}
+    end)
+  end
+
+  defp exclude_board(socket, id) do
+    assign(socket, :excluded_boards, socket.assigns.excluded_boards ++ [id])
+  end
+
+  defp signed_in(socket) do
+    case SessionIdentity.current_user(socket) do
+      nil -> {:error, :not_signed_in}
+      user -> {:ok, user}
+    end
+  end
+
+  defp notice(socket, message) do
+    assign(socket, :feed, %{socket.assigns.feed | notice: message})
   end
 
   defp change_feed(socket, {:ok, feed}), do: {:noreply, assign(socket, :feed, feed)}

@@ -26,6 +26,34 @@ defmodule JobliteWeb.HomeLive.FeedState do
     end)
   end
 
+  @doc """
+  The feed stream: the visible posts with the discovery card placed among them.
+
+  The card takes the place after the last employer post, so it arrives among
+  the candidate posts instead of opening or closing the feed.
+  """
+  @spec stream(%__MODULE__{}, map() | nil) :: [tuple()]
+  def stream(state, discovery) do
+    items = Enum.map(visible_posts(state), &{:post, &1})
+
+    case discovery do
+      nil -> items
+      card -> List.insert_at(items, discovery_index(items), {:discovery, card})
+    end
+  end
+
+  @doc "The place the discovery card takes in a list of stream items."
+  @spec discovery_index([tuple()]) :: non_neg_integer()
+  def discovery_index(items) do
+    case items |> Enum.reverse() |> Enum.find_index(&employer_post?/1) do
+      nil -> 0
+      from_end -> length(items) - from_end
+    end
+  end
+
+  defp employer_post?({:post, %{role: role}}), do: not is_nil(role)
+  defp employer_post?(_item), do: false
+
   @spec select_page(%__MODULE__{}, term()) :: {:ok, %__MODULE__{}} | {:error, String.t()}
   def select_page(state, page) when page in ~w(feed saved mine),
     do: {:ok, %{state | page: page, notice: nil}}

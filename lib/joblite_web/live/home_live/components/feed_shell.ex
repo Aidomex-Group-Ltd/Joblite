@@ -58,6 +58,9 @@ defmodule JobliteWeb.HomeLive.Components.FeedShell do
         phx-value-page={page}
         aria-current={if @page == page, do: "page", else: nil}
       ><.icon name={icon} /><span>{label}</span></button>
+      <a class="jf-nav-link" id="nav-explore" href="/explore">
+        <.icon name="compass" /><span>Explore</span>
+      </a>
       <button type="button" data-feed-action="compose"><.icon name="plus" /><span>Create</span></button>
     </nav>
     """
