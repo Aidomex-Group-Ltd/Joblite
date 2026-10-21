@@ -1,0 +1,25 @@
+.jf-shell { max-width: 620px; margin: auto; border-left: 1px solid var(--jf-line); border-right: 1px solid var(--jf-line); background: var(--jf-surface); }
+.jf-header { display: flex; align-items: center; justify-content: space-between; height: 66px; padding: 0 18px; }
+.jf-logo { display: inline-flex; align-items: center; color: var(--jf-text); text-decoration: none; font-size: 25px; font-weight: 750; letter-spacing: -1.6px; }
+.jf-logo > span { display: grid; place-items: center; width: 28px; height: 30px; border-radius: 9px; background: var(--jf-accent); color: white; font-size: 27px; line-height: 1; padding-bottom: 4px; margin-right: 8px; }
+.jf-logo > b { color: var(--jf-accent); }
+.jf-header > div { display: flex; align-items: center; gap: 8px; }
+.jf-header small { font-size: 10px; letter-spacing: .12em; color: var(--jf-muted); }
+.jf-tabs { display: flex; border-bottom: 1px solid var(--jf-line); position: sticky; top: 0; z-index: 2; background: var(--jf-surface); }
+.jf-tabs button { position: relative; height: 47px; flex: 1; color: var(--jf-muted); font-size: 13px; }
+.jf-tabs button[aria-pressed="true"] { font-weight: 650; color: var(--jf-text); }
+.jf-tabs button[aria-pressed="true"]::after { content: ""; position: absolute; bottom: 0; height: 3px; width: 38px; left: calc(50% - 19px); background: var(--jf-accent); border-radius: 4px 4px 0 0; }
+.jf-feed { min-width: 0; padding-bottom: calc(70px + env(safe-area-inset-bottom)); }
+.jf-quick-compose { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--jf-line); }
+.jf-quick-compose > button:not(.jf-icon-button) { flex: 1; min-width: 0; text-align: left; font-size: 14px; min-height: 44px; color: var(--jf-muted); }
+.jf-quick-compose > .jf-icon-button { color: var(--jf-accent); }
+.jf-bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: min(100%,620px); display: grid; grid-template-columns: repeat(4,1fr); align-items: center; min-height: 65px; padding: 4px 4px calc(4px + env(safe-area-inset-bottom)); background: var(--jf-surface); border: 1px solid var(--jf-line); border-bottom: 0; z-index: 3; }
+.jf-bottom-nav button { display: grid; justify-items: center; align-content: center; gap: 4px; height: 52px; color: var(--jf-muted); font-size: 11px; }
+.jf-bottom-nav button[aria-current="page"] { color: var(--jf-text); font-weight: 650; }
+.jf-bottom-nav button:last-child { color: var(--jf-accent); }
+.jf-empty { text-align: center; padding: 50px 25px; }
+.jf-empty h2 { font-size: 24px; margin-bottom: 13px; }
+.jf-empty p { color: var(--jf-muted); font-size: 14px; line-height: 1.7; }
+.jf-end { padding: 25px 20px; text-align: center; font-size: 12px; color: var(--jf-muted); line-height: 1.8; }
+.jf-end button { display: block; margin: 12px auto; min-height: 44px; text-decoration: underline; text-underline-offset: 3px; }
+@media (min-width: 700px) { .jf-app { background: var(--jf-soft); } }

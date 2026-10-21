@@ -15,13 +15,15 @@ defmodule JobliteWeb.AccountLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <h1>Account</h1>
-    <p>Logged in as <strong>{@current_user.email}</strong></p>
-    <form action="/users/log-out" method="post">
-      <input type="hidden" name="_method" value="delete" />
-      <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
-      <button type="submit">Log out</button>
-    </form>
+    <main id="main" class="container">
+      <h1>Account</h1>
+      <p>Logged in as <strong>{@current_user.email}</strong></p>
+      <form action="/users/log-out" method="post">
+        <input type="hidden" name="_method" value="delete" />
+        <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
+        <button type="submit">Log out</button>
+      </form>
+    </main>
     """
   end
 end

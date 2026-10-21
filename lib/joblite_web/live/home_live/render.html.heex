@@ -1,29 +1,38 @@
-<p class="eyebrow">Foundation starter</p>
-<h1>Hiring intelligence, built to be understood.</h1>
-<p>
-  This starter establishes the monolith boundary. Hiring and AI features are not implemented yet.
-</p>
-<dl class="architecture">
-  <div>
-    <dt>Interface</dt><dd>{@architecture.ui}</dd>
+<div id="joblite-feed" class="jf-app" phx-hook="FeedRoot">
+  <div class="jf-shell">
+    <.header />
+    <.tabs page={@feed.page} tab={@feed.tab} />
+    <main id="main" class="jf-feed">
+      <div class="jf-connection" role="status">Connection interrupted. Reconnecting…</div>
+      <p id="feed-notice" class="jf-notice" role="status" aria-live="polite">{@feed.notice}</p>
+      <.quick_compose :if={@feed.page != "saved"} />
+      <div id="feed-posts">
+        <.post
+          :for={post <- JobliteWeb.HomeLive.FeedState.visible_posts(@feed)}
+          post={post}
+          liked={MapSet.member?(@feed.liked, post.id)}
+          saved={MapSet.member?(@feed.saved, post.id)}
+        />
+      </div>
+      <.empty_state
+        :if={JobliteWeb.HomeLive.FeedState.visible_posts(@feed) == []}
+        page={@feed.page}
+      />
+      <footer class="jf-end">
+        Sample feed · saves and posts reset on refresh.
+        <button
+          id="architecture-details"
+          type="button"
+          phx-click="feed:about"
+          aria-expanded={to_string(@feed.show_about)}
+        >About this preview</button>
+        <p :if={@feed.show_about} id="boundary-explanation">
+          {@architecture.ui} · {@architecture.database} · {@architecture.runtime}. Only backend contexts access the database.
+        </p>
+      </footer>
+    </main>
+    <.bottom_nav page={@feed.page} />
   </div>
-  <div>
-    <dt>Data store</dt><dd>{@architecture.database}</dd>
-  </div>
-  <div>
-    <dt>Deployment</dt><dd>{@architecture.runtime}</dd>
-  </div>
-</dl>
-<button
-  id="architecture-details"
-  phx-click="toggle-details"
-  aria-expanded={to_string(@show_details)}
->
-  Explain the repository boundary
-</button>
-<section :if={@show_details} id="boundary-explanation" aria-label="Repository boundary">
-  <h2>Two repositories, one application</h2>
-  <p>
-    LiveView calls public backend functions in the same BEAM. Only backend contexts access PostgreSQL.
-  </p>
-</section>
+  <.composer />
+  <.media_viewer />
+</div>

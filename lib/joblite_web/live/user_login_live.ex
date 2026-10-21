@@ -10,25 +10,27 @@ defmodule JobliteWeb.UserLoginLive do
   @impl true
   def render(assigns) do
     ~H"""
-    <h1>Log in</h1>
-    <form action="/users/log-in" method="post">
-      <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
-      <p>
-        <label for="user_email">Email</label>
-        <input id="user_email" name="user[email]" type="email" autocomplete="email" required />
-      </p>
-      <p>
-        <label for="user_password">Password</label>
-        <input
-          id="user_password"
-          name="user[password]"
-          type="password"
-          autocomplete="current-password"
-          required
-        />
-      </p>
-      <p><button type="submit">Log in</button></p>
-    </form>
+    <main id="main" class="container">
+      <h1>Log in</h1>
+      <form action="/users/log-in" method="post">
+        <input type="hidden" name="_csrf_token" value={Plug.CSRFProtection.get_csrf_token()} />
+        <p>
+          <label for="user_email">Email</label>
+          <input id="user_email" name="user[email]" type="email" autocomplete="email" required />
+        </p>
+        <p>
+          <label for="user_password">Password</label>
+          <input
+            id="user_password"
+            name="user[password]"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
+        </p>
+        <p><button type="submit">Log in</button></p>
+      </form>
+    </main>
     """
   end
 end

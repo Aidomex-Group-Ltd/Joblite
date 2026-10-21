@@ -25,10 +25,12 @@ defmodule JobliteWeb.SessionControllerTest do
 
     test "wrong password flashes an error and issues no session token", %{conn: conn} do
       conn =
-        post(conn, "/users/log-in", user: %{
-          email: "login@example.com",
-          password: "not-the-password"
-        })
+        post(conn, "/users/log-in",
+          user: %{
+            email: "login@example.com",
+            password: "not-the-password"
+          }
+        )
 
       assert redirected_to(conn) == "/users/log-in"
       refute get_session(conn, :user_token)

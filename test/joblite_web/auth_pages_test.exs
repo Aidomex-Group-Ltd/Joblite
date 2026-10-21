@@ -63,6 +63,7 @@ defmodule JobliteWeb.AuthPagesTest do
       {:ok, _view, _html} = live(conn, "/account")
 
       cutoff = DateTime.add(DateTime.utc_now(), -61, :day)
+
       Ecto.Adapters.SQL.query!(
         Joblite.Repo,
         "UPDATE users_tokens SET inserted_at = $1",
