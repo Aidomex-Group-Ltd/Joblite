@@ -66,7 +66,7 @@ defmodule JobliteWeb.HomeLive do
   def handle_event("boards:save", %{"id" => id}, socket) do
     with {:ok, user} <- signed_in(socket),
          {:ok, _saved} <- JobBoards.save_board(user, id) do
-      {:noreply, notice(socket, "Board saved. Find it under Saved boards.")}
+      {:noreply, notice(socket, "Board saved.")}
     else
       {:error, :not_signed_in} ->
         {:noreply, notice(socket, "Log in to save a board.")}
@@ -83,7 +83,7 @@ defmodule JobliteWeb.HomeLive do
          socket
          |> exclude_board(id)
          |> load_discovery()
-         |> notice("Board hidden for this session.")}
+         |> notice("Board dismissed for this session.")}
 
       user ->
         case JobBoards.dismiss_board(user, id) do
@@ -92,7 +92,7 @@ defmodule JobliteWeb.HomeLive do
              socket
              |> exclude_board(id)
              |> load_discovery()
-             |> notice("Board hidden. You can bring it back from Saved boards.")}
+             |> notice("Board dismissed.")}
 
           {:error, :unknown_source} ->
             {:noreply, notice(socket, "That board is no longer in the directory.")}

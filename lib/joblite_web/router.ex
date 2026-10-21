@@ -18,13 +18,6 @@ defmodule JobliteWeb.Router do
     plug JobliteWeb.UserAuth, :redirect_if_user_is_authenticated
   end
 
-  # The feed counts its visits in the browser session. The count rotates the
-  # job board discovery card, so a session meets another board when it opens
-  # the feed again.
-  pipeline :feed do
-    plug JobliteWeb.DiscoverySession
-  end
-
   scope "/", JobliteWeb do
     get "/health/live", HealthController, :live
     get "/health/ready", HealthController, :ready
@@ -52,7 +45,7 @@ defmodule JobliteWeb.Router do
   live_session :default,
     on_mount: [{JobliteWeb.UserAuth, :mount_current_user}] do
     scope "/", JobliteWeb do
-      pipe_through [:browser, :feed]
+      pipe_through [:browser]
 
       live "/", HomeLive
     end
@@ -62,6 +55,12 @@ defmodule JobliteWeb.Router do
 
       live "/explore", ExploreLive
     end
+
+    scope "/", JobliteWeb do
+      pipe_through [:browser]
+
+      live "/explore/saved", ExploreLive, :saved
+    end
   end
 
   live_session :protected,
@@ -70,7 +69,6 @@ defmodule JobliteWeb.Router do
       pipe_through [:browser]
 
       live "/account", AccountLive, :index
-      live "/explore/saved", SavedBoardsLive
     end
   end
 end

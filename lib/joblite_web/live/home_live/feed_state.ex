@@ -27,10 +27,8 @@ defmodule JobliteWeb.HomeLive.FeedState do
   end
 
   @doc """
-  The feed stream: the visible posts with the discovery card placed among them.
-
-  The card takes the place after the last employer post, so it arrives among
-  the candidate posts instead of opening or closing the feed.
+  The feed stream: the visible posts with the Joblite Discovery card placed
+  between posts (after employer/normal posts), not as a fake user post.
   """
   @spec stream(%__MODULE__{}, map() | nil) :: [tuple()]
   def stream(state, discovery) do
@@ -45,9 +43,15 @@ defmodule JobliteWeb.HomeLive.FeedState do
   @doc "The place the discovery card takes in a list of stream items."
   @spec discovery_index([tuple()]) :: non_neg_integer()
   def discovery_index(items) do
-    case items |> Enum.reverse() |> Enum.find_index(&employer_post?/1) do
-      nil -> 0
-      from_end -> length(items) - from_end
+    case Enum.find_index(items, &employer_post?/1) do
+      nil ->
+        case length(items) do
+          0 -> 0
+          1 -> 1
+          n -> min(2, n)
+        end
+
+      idx -> min(idx + 1, length(items))
     end
   end
 
