@@ -95,7 +95,7 @@ defmodule JobliteWeb.HomeLive.FeedState do
       {:error, "This preview is limited to 20 posts. Refresh to start a new session."}
     else
       post = %{
-        id: "preview-#{System.unique_integer([:positive])}",
+        id: "preview-#{Enum.count(state.posts, & &1.mine) + 1}",
         author: "You",
         handle: "@you",
         initial: "Y",

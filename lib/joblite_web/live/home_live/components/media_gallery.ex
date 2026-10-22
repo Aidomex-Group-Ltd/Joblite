@@ -29,7 +29,7 @@ defmodule JobliteWeb.HomeLive.Components.MediaGallery do
       >
         <img
           :if={not media.local}
-          src={media.thumbnail}
+          src={media.thumbnail || media.source}
           alt={media.alt}
           loading="lazy"
           decoding="async"

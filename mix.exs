@@ -30,6 +30,8 @@ defmodule Joblite.Web.MixProject do
       {:phoenix_html, "~> 4.3"},
       {:bandit, "~> 1.0"},
       {:jason, "~> 1.4"},
+      {:swoosh, "~> 1.19"},
+      {:gen_smtp, "~> 1.2"},
       {:esbuild, "~> 0.10", runtime: Mix.env() == :dev},
       {:lazy_html, ">= 0.1.0", only: :test},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},

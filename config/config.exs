@@ -5,7 +5,12 @@ import_config "../../backend/config/secrets.exs"
 import_config "../../backend/config/shared.exs"
 
 config :phoenix, :json_library, Jason
+config :swoosh, :api_client, JobliteWeb.NoopApiClient
 config :joblite_web, :secure_cookies, config_env() == :prod
+
+# Development and test keep sign-in codes in the local Swoosh mailbox. Production
+# overrides this in runtime.exs with SMTP settings from the environment.
+config :joblite_web, JobliteWeb.Mailer, adapter: Swoosh.Adapters.Local
 
 config :joblite_web, JobliteWeb.Endpoint,
   url: [host: "localhost"],

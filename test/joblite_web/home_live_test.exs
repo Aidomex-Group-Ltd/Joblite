@@ -103,6 +103,15 @@ defmodule JobliteWeb.HomeLiveTest do
     assert has_element?(view, "#boundary-explanation", "PostgreSQL")
   end
 
+  test "the desktop frame exposes navigation and a secondary rail", %{conn: conn} do
+    {:ok, view, _html} = live(conn, "/")
+
+    assert has_element?(view, ".jf-layout .jf-shell")
+    assert has_element?(view, ".jf-rail-left #rail-nav-feed[aria-current='page']")
+    assert has_element?(view, ".jf-rail-left #rail-nav-saved")
+    assert has_element?(view, ".jf-rail-right .jf-rail-card")
+  end
+
   test "health endpoints: liveness always answers, readiness reflects the database", %{conn: conn} do
     assert %{"status" => "up"} == conn |> get("/health/live") |> json_response(200)
     assert %{"status" => "ready"} == conn |> get("/health/ready") |> json_response(200)
@@ -186,12 +195,15 @@ defmodule JobliteWeb.HomeLiveTest do
       assert has_element?(view, "#feed-notice", "no longer in the directory")
     end
 
-    test "the next visit of the session offers another board", %{conn: conn} do
+    test "the server cycle advances the board after thirty minutes", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/")
       render_async(view, 1_000)
       first = view |> element("#discovery-card") |> render() |> board_slug()
 
-      conn = init_test_session(conn, %{"job_board_discovery_visit" => 1})
+      Joblite.Repo.query!(
+        "UPDATE job_board_discovery_cycles SET started_at = date_trunc('second', now()) - interval '31 minutes' WHERE id = 1"
+      )
+
       {:ok, next_view, _html} = live(conn, "/")
       render_async(next_view, 1_000)
       second = next_view |> element("#discovery-card") |> render() |> board_slug()
@@ -200,15 +212,28 @@ defmodule JobliteWeb.HomeLiveTest do
     end
 
     test "the card states the eligibility of the board", %{conn: conn} do
+      Joblite.Repo.query!(
+        "UPDATE job_board_discovery_cycles SET slot = 0, started_at = date_trunc('second', now()) WHERE id = 1"
+      )
+
       {:ok, view, _html} = live(conn, "/")
-      render_async(view, 1_000)
+      render_async(view, 3_000)
 
       assert has_element?(view, "#discovery-card .jf-discovery-facts", "Worldwide remote")
       assert has_element?(view, "#discovery-card .jf-discovery-facts", "Coverage confirmed")
     end
 
     test "the card links to the original listing when the board published one", %{conn: conn} do
+      Joblite.Repo.query!(
+        "UPDATE job_board_discovery_cycles SET slot = 0, started_at = date_trunc('second', now()) WHERE id = 1"
+      )
+
+      import Ecto.Query
       {:ok, source} = Joblite.JobBoards.get_source_by_slug("jobicy")
+
+      Joblite.Repo.update_all(from(s in Joblite.JobBoards.Source, where: s.id == ^source.id),
+        set: [last_synced_at: nil]
+      )
 
       assert {:ok, _result} =
                Joblite.JobBoards.sync_source(source,
@@ -231,7 +256,7 @@ defmodule JobliteWeb.HomeLiveTest do
                )
 
       {:ok, view, _html} = live(conn, "/")
-      render_async(view, 1_000)
+      render_async(view, 3_000)
 
       assert has_element?(view, "#discovery-card[data-board='jobicy']")
 

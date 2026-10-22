@@ -41,6 +41,42 @@ defmodule JobliteWeb.HomeLive.Components.FeedShell do
 
   attr(:page, :string, required: true)
 
+  def desktop_nav(assigns) do
+    ~H"""
+    <aside class="jf-rail jf-rail-left" aria-label="Desktop navigation">
+      <a class="jf-rail-logo" href="/" aria-label="Joblite home">
+        <span>j</span>joblite<b>.</b>
+      </a>
+
+      <nav class="jf-rail-nav">
+        <button
+          :for={
+            {page, label} <- [
+              {"feed", "Feed"},
+              {"saved", "Saved posts"},
+              {"mine", "My posts"}
+            ]
+          }
+          id={"rail-nav-#{page}"}
+          type="button"
+          phx-click="feed:page"
+          phx-value-page={page}
+          aria-current={if @page == page, do: "page", else: nil}
+        >{label}</button>
+        <a href="/explore">Explore boards</a>
+        <a href="/explore/saved">Saved boards</a>
+        <a href="/account">Account</a>
+      </nav>
+
+      <p class="jf-rail-note">
+        A preview workspace for candidates and the people who hire them.
+      </p>
+    </aside>
+    """
+  end
+
+  attr(:page, :string, required: true)
+
   def bottom_nav(assigns) do
     ~H"""
     <nav class="jf-bottom-nav" aria-label="Main navigation">

@@ -4,13 +4,13 @@ defmodule JobliteWeb.HomeLive do
 
   The feed carries one job board discovery card. The card comes from the
   registry in the core, is placed among the candidate posts and is labelled
-  directory content. Its rotation follows the visits of the browser session,
-  so a session meets another board when it opens the feed again.
+  directory content. A database-backed 30-minute cycle rotates the board on
+  the server; the page schedules a refresh when the next cycle begins.
   """
   use Phoenix.LiveView, layout: {JobliteWeb.Layouts, :app}
 
   alias Joblite.JobBoards
-  alias JobliteWeb.HomeLive.{FeedState, PostForm}
+  alias JobliteWeb.HomeLive.{FeedState, PostForm, Uploads}
   alias JobliteWeb.UserAuth
   import JobliteWeb.HomeLive.Components.FeedShell
   import JobliteWeb.HomeLive.Components.FeedStream
@@ -20,15 +20,33 @@ defmodule JobliteWeb.HomeLive do
   embed_templates("home_live/render.html")
 
   @impl true
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
+    cycle = JobBoards.discovery_cycle()
+
     socket =
       socket
       |> assign(:feed, FeedState.new())
       |> assign(:architecture, Joblite.Health.architecture())
       |> assign(:excluded_boards, [])
-      |> assign(:discovery_offset, max((session["job_board_discovery_visit"] || 1) - 1, 0))
+      |> assign(:discovery_offset, cycle.offset)
+      |> schedule_discovery_refresh(cycle.next_at)
+      |> assign(:upload_error, nil)
+      |> Phoenix.LiveView.allow_upload(:media, Uploads.config())
 
     {:ok, load_discovery(socket)}
+  end
+
+  @impl true
+  def handle_info(:refresh_discovery, socket) do
+    cycle = JobBoards.discovery_cycle()
+
+    socket =
+      socket
+      |> assign(:discovery_offset, cycle.offset)
+      |> schedule_discovery_refresh(cycle.next_at)
+      |> load_discovery()
+
+    {:noreply, socket}
   end
 
   @impl true
@@ -54,6 +72,41 @@ defmodule JobliteWeb.HomeLive do
       {:reply, %{ok: true}, assign(socket, :feed, feed)}
     else
       {:error, reason} -> {:reply, %{ok: false, error: reason}, socket}
+    end
+  end
+
+  def handle_event("validate-media", _params, socket) do
+    socket =
+      Enum.reduce(socket.assigns.uploads.media.entries, socket, fn entry, socket ->
+        case Uploads.validate(entry) do
+          :ok ->
+            socket
+
+          {:error, reason} ->
+            socket
+            |> Phoenix.LiveView.cancel_upload(:media, entry.ref)
+            |> assign(:upload_error, reason)
+        end
+      end)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("submit-post", params, socket) do
+    uploaded = Uploads.consume(socket, :media)
+
+    case PostForm.parse(params, uploaded) do
+      {:ok, attrs} ->
+        case FeedState.prepend(socket.assigns.feed, attrs) do
+          {:ok, feed} ->
+            {:noreply, socket |> assign(:feed, feed) |> assign(:upload_error, nil)}
+
+          {:error, reason} ->
+            {:noreply, assign(socket, :upload_error, reason)}
+        end
+
+      {:error, reason} ->
+        {:noreply, assign(socket, :upload_error, reason)}
     end
   end
 
@@ -108,6 +161,15 @@ defmodule JobliteWeb.HomeLive do
   @spec discovery_card(Phoenix.LiveView.AsyncResult.t()) :: map() | nil
   def discovery_card(%Phoenix.LiveView.AsyncResult{ok?: true, result: [card | _rest]}), do: card
   def discovery_card(_result), do: nil
+
+  defp schedule_discovery_refresh(socket, next_at) do
+    if connected?(socket) do
+      milliseconds = max(DateTime.diff(next_at, DateTime.utc_now(), :millisecond), 1_000)
+      Process.send_after(self(), :refresh_discovery, milliseconds)
+    end
+
+    socket
+  end
 
   defp load_discovery(socket) do
     user = socket.assigns.current_user

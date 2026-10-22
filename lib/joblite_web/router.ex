@@ -26,7 +26,11 @@ defmodule JobliteWeb.Router do
   scope "/", JobliteWeb do
     pipe_through :browser
 
-    post "/users/log-in", SessionController, :create
+    post "/users/log-in", EmailAuthController, :login
+    post "/users/log-in/verify", EmailAuthController, :verify
+    post "/users/log-in/resend", EmailAuthController, :resend
+    post "/users/sign-up", EmailAuthController, :signup
+    post "/users/recover", EmailAuthController, :recover
     delete "/users/log-out", SessionController, :delete
   end
 
@@ -38,7 +42,10 @@ defmodule JobliteWeb.Router do
     scope "/", JobliteWeb do
       pipe_through [:browser, :redirect_if_user_is_authenticated]
 
-      live "/users/log-in", UserLoginLive, :new
+      live "/users/log-in", UserLoginLive, :login
+      live "/users/recover", UserLoginLive, :recover
+      live "/users/sign-up", UserSignupLive, :new
+      live "/users/log-in/verify", UserVerifyLive, :new
     end
   end
 
@@ -55,12 +62,6 @@ defmodule JobliteWeb.Router do
 
       live "/explore", ExploreLive
     end
-
-    scope "/", JobliteWeb do
-      pipe_through [:browser]
-
-      live "/explore/saved", ExploreLive, :saved
-    end
   end
 
   live_session :protected,
@@ -69,6 +70,7 @@ defmodule JobliteWeb.Router do
       pipe_through [:browser]
 
       live "/account", AccountLive, :index
+      live "/explore/saved", SavedBoardsLive
     end
   end
 end

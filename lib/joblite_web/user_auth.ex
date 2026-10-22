@@ -22,6 +22,8 @@ defmodule JobliteWeb.UserAuth do
 
   @session_key :user_token
   @socket_token_key :joblite_session_token
+  @pending_user_key "pending_login_user_id"
+  @pending_email_key "pending_login_email"
 
   @doc "Plug callback; the action atom is passed through unchanged."
   def init(action), do: action
@@ -71,6 +73,32 @@ defmodule JobliteWeb.UserAuth do
     conn
     |> renew_session()
     |> redirect(to: "/")
+  end
+
+  @doc """
+  Remembers which address is waiting for a sign-in code. The id is nil for an
+  unknown address; keeping the email lets the verification page respond the
+  same way without confirming whether an account exists.
+  """
+  @spec put_pending_login(Plug.Conn.t(), String.t(), User.t() | nil) :: Plug.Conn.t()
+  def put_pending_login(conn, email, user) when is_binary(email) do
+    conn
+    |> put_session(@pending_email_key, email)
+    |> put_session(@pending_user_key, user && user.id)
+  end
+
+  @doc "The pending sign-in identity from a session map."
+  @spec pending_login(map()) :: %{email: String.t() | nil, user_id: String.t() | nil}
+  def pending_login(session) when is_map(session) do
+    %{email: session[@pending_email_key], user_id: session[@pending_user_key]}
+  end
+
+  @doc "Forgets the pending sign-in identity."
+  @spec clear_pending_login(Plug.Conn.t()) :: Plug.Conn.t()
+  def clear_pending_login(conn) do
+    conn
+    |> delete_session(@pending_email_key)
+    |> delete_session(@pending_user_key)
   end
 
   @doc """

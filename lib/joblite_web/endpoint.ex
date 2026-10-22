@@ -14,7 +14,7 @@ defmodule JobliteWeb.Endpoint do
     websocket: [connect_info: [session: @session_options]],
     longpoll: [connect_info: [session: @session_options]]
 
-  plug Plug.Static, at: "/", from: :joblite_web, gzip: false, only: ~w(assets)
+  plug Plug.Static, at: "/", from: :joblite_web, gzip: false, only: ~w(assets uploads)
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 

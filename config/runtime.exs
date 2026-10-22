@@ -1,6 +1,29 @@
 import Config
 
 if config_env() == :prod do
+  # Sign-in codes are delivered by SMTP. The relay defaults to localhost so a
+  # deployment without mail settings still boots and reports a delivery error
+  # instead of silently pretending a code was sent. Set the SMTP_* variables
+  # and MAIL_FROM for a working deployment.
+  smtp_credentials =
+    case {System.get_env("SMTP_USERNAME"), System.get_env("SMTP_PASSWORD")} do
+      {username, password} when is_binary(username) and is_binary(password) ->
+        [username: username, password: password]
+
+      _ ->
+        [auth: "never"]
+    end
+
+  config :joblite_web,
+         JobliteWeb.Mailer,
+         [
+           adapter: Swoosh.Adapters.SMTP,
+           relay: System.get_env("SMTP_HOST", "localhost"),
+           port: System.get_env("SMTP_PORT", "587"),
+           tls: System.get_env("SMTP_TLS", "always"),
+           ssl: System.get_env("SMTP_SSL", "false")
+         ] ++ smtp_credentials
+
   # DATABASE_SSL selects the PostgreSQL transport policy. The default
   # `require` keeps the connection encrypted without certificate pinning,
   # which is the only usable mode on managed platforms that terminate
