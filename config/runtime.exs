@@ -2,17 +2,27 @@ import Config
 
 if config_env() == :prod do
   # DATABASE_SSL selects the PostgreSQL transport policy. The default
-  # verify-full pins the server against a supplied CA bundle; managed platforms
-  # that terminate database TLS without shipping a CA file (Render's managed
-  # PostgreSQL) set DATABASE_SSL=require, which keeps the connection encrypted
-  # without certificate pinning. An unknown value fails the boot instead of
-  # silently downgrading.
+  # `require` keeps the connection encrypted without certificate pinning,
+  # which is the only usable mode on managed platforms that terminate
+  # database TLS without shipping a CA file (Render managed PostgreSQL).
+  # `verify-full` adds pinning against a CA bundle that must exist inside
+  # the container: a missing file fails the boot here, with the variable
+  # named, instead of looping on connection errors. An unknown value fails
+  # the boot too: nothing is ever silently downgraded.
   database_ssl =
-    case System.get_env("DATABASE_SSL", "verify-full") do
+    case System.get_env("DATABASE_SSL", "require") do
       "verify-full" ->
+        ca_cert = System.fetch_env!("DATABASE_CA_CERT")
+
+        unless File.regular?(ca_cert) do
+          raise "DATABASE_CA_CERT points to #{inspect(ca_cert)}, which does not exist " <>
+                  "in this container; mount the bundle as a secret file, or use " <>
+                  "DATABASE_SSL=require on a platform that ships no CA file"
+        end
+
         [
           verify: :verify_peer,
-          cacertfile: System.fetch_env!("DATABASE_CA_CERT"),
+          cacertfile: ca_cert,
           server_name_indication:
             String.to_charlist(System.fetch_env!("DATABASE_SSL_SERVER_NAME"))
         ]
