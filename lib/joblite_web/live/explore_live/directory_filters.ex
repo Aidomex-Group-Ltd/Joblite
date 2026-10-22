@@ -32,8 +32,13 @@ defmodule JobliteWeb.ExploreLive.DirectoryFilters do
 
   defp region(params) do
     case params["region"] do
-      value when is_binary(value) -> if value in ~w(global africa europe north_america latin_america asia_pacific_mena), do: value, else: nil
-      _other -> nil
+      value when is_binary(value) ->
+        if value in ~w(global africa europe north_america latin_america asia_pacific_mena),
+          do: value,
+          else: nil
+
+      _other ->
+        nil
     end
   end
 end

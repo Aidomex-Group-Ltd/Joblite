@@ -103,6 +103,4 @@ defmodule JobliteWeb.ExploreLive do
       {:error, _reason} -> MapSet.new()
     end
   end
-
-
 end

@@ -10,10 +10,17 @@ defmodule JobliteWeb.HomeLive.Components.DiscoveryCard do
 
   def discovery_card(assigns) do
     ~H"""
-    <aside id="discovery-card" class="jf-discovery" data-board={@card.slug} aria-labelledby="discovery-card-title">
+    <aside
+      id="discovery-card"
+      class="jf-discovery"
+      data-board={@card.slug}
+      aria-labelledby="discovery-card-title"
+    >
       <p class="jf-discovery-label"><.icon name="compass" /> Joblite Discovery</p>
       <h2 id="discovery-card-title" class="jf-discovery-title">{@card.name}</h2>
-      <p class="jf-discovery-text">Explore job boards from around the world. Open a board to search for jobs directly on its website.</p>
+      <p class="jf-discovery-text">
+        Explore job boards from around the world. Open a board to search for jobs directly on its website.
+      </p>
 
       <div class="jf-discovery-actions">
         <a

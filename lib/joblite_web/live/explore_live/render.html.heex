@@ -2,7 +2,9 @@
   <div class="jf-shell">
     <main id="main" class="jf-explore">
       <h1>Explore boards</h1>
-      <p class="jf-explore-intro">Explore job boards and search for jobs directly on their websites.</p>
+      <p class="jf-explore-intro">
+        Explore job boards and search for jobs directly on their websites.
+      </p>
 
       <form
         id="explore-filters"
@@ -29,9 +31,15 @@
             <option value="">Global</option>
             <option value="africa" selected={@filters.region == "africa"}>Africa</option>
             <option value="europe" selected={@filters.region == "europe"}>Europe</option>
-            <option value="north_america" selected={@filters.region == "north_america"}>North America</option>
-            <option value="latin_america" selected={@filters.region == "latin_america"}>Latin America</option>
-            <option value="asia_pacific_mena" selected={@filters.region == "asia_pacific_mena"}>Asia-Pacific/MENA</option>
+            <option value="north_america" selected={@filters.region == "north_america"}>
+              North America
+            </option>
+            <option value="latin_america" selected={@filters.region == "latin_america"}>
+              Latin America
+            </option>
+            <option value="asia_pacific_mena" selected={@filters.region == "asia_pacific_mena"}>
+              Asia-Pacific/MENA
+            </option>
             <option value="global" selected={@filters.region == "global"}>Global coverage</option>
           </select>
         </label>
@@ -44,7 +52,9 @@
           <p class="jf-explore-state" aria-live="polite">Loading boards…</p>
         </:loading>
         <:failed :let={_failure}>
-          <p class="jf-explore-state" role="alert">Something went wrong loading boards. Try again.</p>
+          <p class="jf-explore-state" role="alert">
+            Something went wrong loading boards. Try again.
+          </p>
         </:failed>
         <div :if={directory == []} class="jf-explore-state">
           <h2>No boards match</h2>

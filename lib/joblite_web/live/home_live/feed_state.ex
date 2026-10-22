@@ -51,7 +51,8 @@ defmodule JobliteWeb.HomeLive.FeedState do
           n -> min(2, n)
         end
 
-      idx -> min(idx + 1, length(items))
+      idx ->
+        min(idx + 1, length(items))
     end
   end
 
