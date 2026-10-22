@@ -5,16 +5,23 @@ defmodule JobliteWeb.UserAuth do
   exactly once; every request and every LiveView mount (disconnected and
   connected) re-resolves it against the Accounts context, so revocation and
   expiry are enforced server-side even for already-mounted pages.
+
+  A LiveView that acts on the account of the visitor resolves the identity
+  again through `current_user/1`. The raw token is kept in the private part of
+  the socket and is never assigned, so it never reaches the client.
   """
 
   import Plug.Conn
   import Phoenix.Controller, only: [redirect: 2]
 
   alias Joblite.Accounts
+  alias Joblite.Accounts.User
   alias Phoenix.Component
   alias Phoenix.LiveView
+  alias Phoenix.LiveView.Socket
 
   @session_key :user_token
+  @socket_token_key :joblite_session_token
 
   @doc "Plug callback; the action atom is passed through unchanged."
   def init(action), do: action
@@ -65,6 +72,16 @@ defmodule JobliteWeb.UserAuth do
     |> renew_session()
     |> redirect(to: "/")
   end
+
+  @doc """
+  The account that owns the current session, resolved again now.
+
+  The session token is taken from the private part of the socket and resolved
+  through `Joblite.Accounts`, so a revoked or expired session cannot act on
+  the account it used to own.
+  """
+  @spec current_user(Socket.t()) :: User.t() | nil
+  def current_user(%Socket{} = socket), do: resolve(token(socket))
 
   @doc """
   LiveView `on_mount` hooks:
@@ -119,11 +136,19 @@ defmodule JobliteWeb.UserAuth do
   end
 
   defp mount_current_user(socket, session) do
-    Component.assign_new(socket, :current_user, fn ->
-      case session["user_token"] do
-        nil -> nil
-        token -> Accounts.get_user_by_session_token(token)
-      end
-    end)
+    token = session["user_token"]
+    socket = put_token(socket, token)
+
+    Component.assign_new(socket, :current_user, fn -> resolve(token) end)
   end
+
+  defp resolve(nil), do: nil
+  defp resolve(token) when is_binary(token), do: Accounts.get_user_by_session_token(token)
+  defp resolve(_token), do: nil
+
+  defp put_token(socket, token) do
+    %{socket | private: Map.put(socket.private, @socket_token_key, token)}
+  end
+
+  defp token(%Socket{private: private}), do: Map.get(private, @socket_token_key)
 end

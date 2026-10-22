@@ -154,6 +154,28 @@ defmodule JobliteWeb.HomeLiveTest do
       assert Enum.any?(boards, &(&1.id == source.id))
     end
 
+    test "a revoked session can no longer save a board for the account it owned", %{
+      conn: conn,
+      user: user
+    } do
+      token = Accounts.generate_user_session_token(user)
+      conn = init_test_session(conn, %{user_token: token})
+      {:ok, view, _html} = live(conn, "/")
+      render_async(view, 1_000)
+
+      slug = view |> element("#discovery-card") |> render() |> board_slug()
+
+      :ok = Accounts.delete_user_session_token(token)
+
+      view |> element("#discovery-card button", "Save") |> render_click()
+
+      assert has_element?(view, "#feed-notice", "Log in to save a board.")
+
+      {:ok, source} = Joblite.JobBoards.get_source_by_slug(slug)
+      assert {:ok, boards} = Joblite.JobBoards.saved_boards(user)
+      refute Enum.any?(boards, &(&1.id == source.id))
+    end
+
     test "an unknown board id is refused", %{conn: conn, user: user} do
       conn = signed_in(conn, user)
       {:ok, view, _html} = live(conn, "/")

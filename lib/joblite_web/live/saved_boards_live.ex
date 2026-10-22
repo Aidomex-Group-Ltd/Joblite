@@ -10,17 +10,16 @@ defmodule JobliteWeb.SavedBoardsLive do
   use Phoenix.LiveView, layout: {JobliteWeb.Layouts, :app}
 
   alias Joblite.JobBoards
-  alias JobliteWeb.SessionIdentity
+  alias JobliteWeb.UserAuth
 
   import JobliteWeb.ExploreLive.Components.BoardCard
 
   embed_templates("saved_boards_live/render.html")
 
   @impl true
-  def mount(_params, session, socket) do
+  def mount(_params, _session, socket) do
     socket =
       socket
-      |> SessionIdentity.attach(session)
       |> assign(:page_title, "Saved boards")
       |> assign(:notice, nil)
 
@@ -81,7 +80,7 @@ defmodule JobliteWeb.SavedBoardsLive do
   end
 
   defp signed_in(socket) do
-    case SessionIdentity.current_user(socket) do
+    case UserAuth.current_user(socket) do
       nil -> {:error, :not_signed_in}
       user -> {:ok, user}
     end

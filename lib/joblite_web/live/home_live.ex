@@ -11,7 +11,7 @@ defmodule JobliteWeb.HomeLive do
 
   alias Joblite.JobBoards
   alias JobliteWeb.HomeLive.{FeedState, PostForm}
-  alias JobliteWeb.SessionIdentity
+  alias JobliteWeb.UserAuth
   import JobliteWeb.HomeLive.Components.FeedShell
   import JobliteWeb.HomeLive.Components.FeedStream
   import JobliteWeb.HomeLive.Components.Composer
@@ -23,7 +23,6 @@ defmodule JobliteWeb.HomeLive do
   def mount(_params, session, socket) do
     socket =
       socket
-      |> SessionIdentity.attach(session)
       |> assign(:feed, FeedState.new())
       |> assign(:architecture, Joblite.Health.architecture())
       |> assign(:excluded_boards, [])
@@ -77,7 +76,7 @@ defmodule JobliteWeb.HomeLive do
   end
 
   def handle_event("boards:dismiss", %{"id" => id}, socket) do
-    case SessionIdentity.current_user(socket) do
+    case UserAuth.current_user(socket) do
       nil ->
         {:noreply,
          socket
@@ -132,7 +131,7 @@ defmodule JobliteWeb.HomeLive do
   end
 
   defp signed_in(socket) do
-    case SessionIdentity.current_user(socket) do
+    case UserAuth.current_user(socket) do
       nil -> {:error, :not_signed_in}
       user -> {:ok, user}
     end
