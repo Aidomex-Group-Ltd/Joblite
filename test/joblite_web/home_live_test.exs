@@ -124,6 +124,7 @@ defmodule JobliteWeb.HomeLiveTest do
 
       assert has_element?(view, "#discovery-card")
       assert has_element?(view, "#discovery-card .jf-discovery-label", "Job board directory")
+      assert has_element?(view, "#discovery-card a.jf-board-open", "Visit job board")
       assert has_element?(view, "#discovery-card a.jf-board-open[target='_blank']")
       assert has_element?(view, "#discovery-card a.jf-board-open[rel='noopener noreferrer']")
     end
@@ -211,7 +212,7 @@ defmodule JobliteWeb.HomeLiveTest do
       assert first != second
     end
 
-    test "the card states the eligibility of the board", %{conn: conn} do
+    test "the card describes the board without exposing internal coverage details", %{conn: conn} do
       Joblite.Repo.query!(
         "UPDATE job_board_discovery_cycles SET slot = 0, started_at = date_trunc('second', now()) WHERE id = 1"
       )
@@ -219,8 +220,18 @@ defmodule JobliteWeb.HomeLiveTest do
       {:ok, view, _html} = live(conn, "/")
       render_async(view, 3_000)
 
-      assert has_element?(view, "#discovery-card .jf-discovery-facts", "Worldwide remote")
-      assert has_element?(view, "#discovery-card .jf-discovery-facts", "Coverage confirmed")
+      html = render(view)
+
+      assert has_element?(
+               view,
+               "#discovery-card .jf-discovery-text",
+               "Find remote job listings across a range of roles and industries."
+             )
+
+      assert has_element?(view, "#discovery-card .jf-board-mode", "Remote opportunities")
+      refute html =~ "Coverage confirmed"
+      refute html =~ "published terms"
+      refute html =~ "2026-10-21"
     end
 
     test "the card links to the original listing when the board published one", %{conn: conn} do

@@ -35,7 +35,12 @@ defmodule JobliteWeb.SavedBoardsLiveTest do
       render_async(view, 1_000)
 
       assert has_element?(view, "#saved-board-remote-ok")
-      assert has_element?(view, "#saved-board-remote-ok .jf-board-mode", "Feed candidate")
+
+      assert has_element?(
+               view,
+               "#saved-board-remote-ok .jf-board-note",
+               "Find remote job listings across a range of roles and industries."
+             )
 
       view |> element("#saved-board-remote-ok button", "Saved") |> render_click()
       render_async(view, 1_000)
@@ -73,7 +78,12 @@ defmodule JobliteWeb.SavedBoardsLiveTest do
       render_async(view, 1_000)
 
       assert has_element?(view, "#hidden-board-jobicy")
-      assert has_element?(view, "#hidden-board-jobicy .jf-board-mode", "Feed candidate")
+
+      assert has_element?(
+               view,
+               "#hidden-board-jobicy .jf-board-note",
+               "Find remote job listings across a range of roles and industries."
+             )
     end
 
     test "a hidden board can be brought back", %{conn: conn, user: user} do

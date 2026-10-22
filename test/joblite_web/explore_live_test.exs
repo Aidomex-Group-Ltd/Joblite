@@ -26,24 +26,47 @@ defmodule JobliteWeb.ExploreLiveTest do
       assert has_element?(view, "#board-remotive")
     end
 
-    test "shows the permission decision of every board and links out", %{conn: conn} do
+    test "shows simple descriptions and links out to every board", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/explore")
       render_async(view, 1_000)
 
-      assert has_element?(view, "#board-remote-ok .jf-board-mode", "Feed candidate")
-      assert has_element?(view, "#board-himalayas .jf-board-mode", "Permission pending")
-      assert has_element?(view, "#board-remotive .jf-board-mode", "Directory only")
+      assert has_element?(
+               view,
+               "#board-remote-ok .jf-board-note",
+               "Find remote job listings across a range of roles and industries."
+             )
 
+      assert has_element?(
+               view,
+               "#board-remotive .jf-board-note",
+               "Explore job listings on this job board."
+             )
+
+      assert has_element?(view, "#board-remote-ok .jf-board-mode", "Worldwide remote")
+      assert has_element?(view, "#board-jobicy .jf-board-mode", "Remote opportunities")
+      assert has_element?(view, "#board-jobget .jf-board-mode", "Remote opportunities")
+
+      assert has_element?(view, "#board-remote-ok a.jf-board-open", "Visit job board")
       assert has_element?(view, "#board-remote-ok a.jf-board-open[href='https://remoteok.com/']")
       assert has_element?(view, "#board-remote-ok a.jf-board-open[target='_blank']")
     end
 
-    test "states what a board may be used for instead of importing it", %{conn: conn} do
+    test "keeps import, coverage and verification details internal", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/explore")
       render_async(view, 1_000)
 
-      assert has_element?(view, "#board-remotive .jf-board-note", "outbound link")
-      assert has_element?(view, "#board-himalayas .jf-board-note", "Written permission")
+      html = render(view)
+
+      refute has_element?(view, "#board-remote-ok .jf-board-terms")
+      refute has_element?(view, "#board-remote-ok .jf-board-status")
+      refute has_element?(view, "#board-remote-ok .jf-board-coverage")
+      refute has_element?(view, "#board-remote-ok .jf-board-facts")
+
+      refute html =~ "Coverage confirmed"
+      refute html =~ "published terms"
+      refute html =~ "2026-10-21"
+      refute html =~ "Synchronization"
+      refute html =~ "Last import error"
     end
 
     test "filters the directory by text and by region", %{conn: conn} do
@@ -88,23 +111,17 @@ defmodule JobliteWeb.ExploreLiveTest do
     end
   end
 
-  describe "the coverage of a board" do
-    test "a card shows where the board covers and what it publishes", %{conn: conn} do
+  describe "the remote availability of a board" do
+    test "only claims worldwide remote when the board supports it", %{conn: conn} do
       {:ok, view, _html} = live(conn, "/explore")
       render_async(view, 1_000)
 
-      assert has_element?(view, "#board-remote-ok .jf-board-tags", "Global")
-      assert has_element?(view, "#board-jobget-countries", "United States")
-      assert has_element?(view, "#board-jobget .jf-board-tag", "North America")
-      assert has_element?(view, "#board-remote-ok-categories", "Engineering")
-    end
+      assert has_element?(view, "#board-remote-ok .jf-board-mode", "Worldwide remote")
+      assert has_element?(view, "#board-jobicy .jf-board-mode", "Remote opportunities")
+      assert has_element?(view, "#board-jobget .jf-board-mode", "Remote opportunities")
 
-    test "a board without a published taxonomy says so instead of guessing", %{conn: conn} do
-      {:ok, view, _html} = live(conn, "/explore")
-      render_async(view, 1_000)
-
-      assert has_element?(view, "#board-himalayas-categories", "Categories pending review")
-      assert has_element?(view, "#board-no-fluff-jobs-countries", "Poland")
+      refute has_element?(view, "#board-remote-ok .jf-board-coverage")
+      refute has_element?(view, "#board-remote-ok .jf-board-facts")
     end
   end
 

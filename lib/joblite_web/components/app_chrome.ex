@@ -43,10 +43,10 @@ defmodule JobliteWeb.Components.AppChrome do
     ~H"""
     <aside class="jf-rail jf-rail-right" aria-label="About Joblite">
       <section class="jf-rail-card">
-        <h2>Directory, not a scraper</h2>
+        <h2>Find your next opportunity</h2>
         <p>
-          Every board links to its original site. Joblite only imports listings when the
-          board's terms allow it, and the source is always named.
+          Browse job boards for remote and local roles, then visit the original site to
+          learn more and apply.
         </p>
       </section>
 
